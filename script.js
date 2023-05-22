@@ -55,9 +55,7 @@ async function paintQuestions() {
                 optionInput.setAttribute("type", "radio")
                 optionInput.setAttribute("name", index)
                 optionInput.setAttribute("value", element)
-                if (element === ele.correct_answer) {
-                    optionInput.setAttribute("data-correct-answer", "true");
-                  }
+                
 
                 optionLabel.appendChild(optionParagraph)
                 optionLabel.appendChild(optionInput)
@@ -112,9 +110,9 @@ document.querySelector("#quiz").addEventListener("submit", function (event) {
     selectedOptions.forEach((option) => {
       let questionIndex = option.getAttribute("name");
       let question = document.querySelectorAll(".hide")[questionIndex];
-      let correctAnswer = question.querySelector("input[data-correct-answer]").value;
+      let correctAnswer = question.querySelector("label.option input[data-correct-answer]");
   
-      if (option.value === correctAnswer) {
+      if (option === correctAnswer) {
         correctCount++;
       } else {
         incorrectCount++;
