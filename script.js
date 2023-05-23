@@ -1,6 +1,17 @@
+// Variables globales
+
 let counter = 0;
 
+let countRightAnswers = 0;
+let countWrongAnswers = 0;
+
 let questionsList = []
+
+if(!localStorage.results) {
+    localStorage.results = JSON.stringify([])
+}
+
+// Función para obtener las preguntas
 
 async function getQuestions() {
     try {
@@ -12,6 +23,8 @@ async function getQuestions() {
         console.log(`ERROR! -> ${error}`);
     }
 }
+
+// Función para pintar las preguntas iniciales
 
 async function paintQuestions() {
 
@@ -36,7 +49,7 @@ async function paintQuestions() {
             questionContainer.setAttribute("id", "question")
 
             let questionsh3 = document.createElement("h3")
-            let questionsh3text = document.createTextNode(ele.question)
+            let questionsh3text = document.createTextNode(`${index+1}. ${ele.question}`)
             questionsh3.appendChild(questionsh3text)
 
             let questionArticle = document.createElement("article")
@@ -76,7 +89,7 @@ async function paintQuestions() {
             let submitButton = document.createElement("button");
             submitButton.setAttribute("type", "submit");
             submitButton.className = "button-container";
-            submitButton.textContent = "Comprobar respuestas";
+            submitButton.textContent = "Siguiente";
     
             document.querySelector("#quiz").appendChild(submitButton);
             showQuestion()
@@ -84,6 +97,9 @@ async function paintQuestions() {
         console.log(`ERROR! -> ${error}`);
     }
     }
+
+
+// Función para mostrar 1 pregunta
 
 function showQuestion() {
     let questionsSelector = document.querySelectorAll("#question")
@@ -95,6 +111,12 @@ function showQuestion() {
     
         questionsSelector[counter].className = "question-container"
         counter += 1;
+    } else {
+        let playerResults = {date: new Date().toJSON(), mark: countRightAnswers}
+        let existingResults = JSON.parse(localStorage.results)
+        existingResults.push(playerResults)
+
+        localStorage.results = JSON.stringify(existingResults)
     }
 }
 
@@ -125,9 +147,11 @@ document.querySelector("#quiz").addEventListener("submit", function (event) {
         } else {
             incorrectCount++;
         }
-    showQuestion()
-  
+
+        countRightAnswers = correctCount
+        countWrongAnswers = incorrectCount
     console.log("Respuestas correctas: " + correctCount);
     console.log("Respuestas incorrectas: " + incorrectCount);
     })
+    showQuestion()
   });
