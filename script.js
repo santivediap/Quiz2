@@ -17,16 +17,17 @@ async function paintQuestions() {
     let val = await getQuestions();
         val.results.forEach((ele, index) => {
 
+            // Pushea la opcion correcta al resto de opciones
+            ele.incorrect_answers.push(ele.correct_answer)
+
+            // Crear nuevas opciones
             let questionOptions = []
 
             while(questionOptions.length < 4) {
                 let randomOption = Math.floor(Math.random() * ele.incorrect_answers.length)
                 questionOptions.push(ele.incorrect_answers[randomOption])
                 ele.incorrect_answers.splice(randomOption, 1)
-
             }
-
-            // ele.incorrect_answers.push(ele.correct_answer)
 
             let questionContainer = document.createElement("div")
             questionContainer.className = "hide"
@@ -39,7 +40,7 @@ async function paintQuestions() {
             let questionArticle = document.createElement("article")
             questionArticle.appendChild(questionsh3)
             
-            // Crear opciones
+            // Crear elementos de opciones
             let optionsContainer = document.createElement("div")
             optionsContainer.className = "options-container"
 
@@ -122,9 +123,3 @@ document.querySelector("#quiz").addEventListener("submit", function (event) {
     console.log("Respuestas correctas: " + correctCount);
     console.log("Respuestas incorrectas: " + incorrectCount);
   });
-
-
-
-
-
-
