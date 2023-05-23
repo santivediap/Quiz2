@@ -1,5 +1,7 @@
 let counter = 0;
 
+let questionsList = []
+
 async function getQuestions() {
     try {
         let response = await fetch ('https://opentdb.com/api.php?amount=10&category=15&difficulty=easy&type=multiple');
@@ -14,8 +16,8 @@ async function getQuestions() {
 async function paintQuestions() {
 
     try {
-    let val = await getQuestions();
-        val.results.forEach((ele, index) => {
+    let val = questionsList
+        val.forEach((ele, index) => {
 
             // Pushea la opcion correcta al resto de opciones
             ele.incorrect_answers.push(ele.correct_answer)
@@ -83,8 +85,6 @@ async function paintQuestions() {
     }
     }
 
-paintQuestions()
-
 function showQuestion() {
     let questionsSelector = document.querySelectorAll("#question")
 
@@ -97,6 +97,14 @@ function showQuestion() {
         counter += 1;
     }
 }
+
+// Código principal (El que se ejecuta al refrescar o abrir la página)
+
+getQuestions().then(val => {
+    questionsList = val.results
+    console.log(questionsList);
+    paintQuestions()
+})
 
 // VALIDACION DEL FORMULARIO
 
@@ -111,15 +119,15 @@ document.querySelector("#quiz").addEventListener("submit", function (event) {
     selectedOptions.forEach((option) => {
       let questionIndex = option.getAttribute("name");
       let question = document.querySelectorAll(".hide")[questionIndex];
-      let correctAnswer = question.querySelector("label.option input[data-correct-answer]");
   
-      if (option === correctAnswer) {
-        correctCount++;
-      } else {
-        incorrectCount++;
-      }
-    });
+    if (option.value == questionsList[questionIndex].correct_answer) {
+            correctCount++;
+        } else {
+            incorrectCount++;
+        }
+    showQuestion()
   
     console.log("Respuestas correctas: " + correctCount);
     console.log("Respuestas incorrectas: " + incorrectCount);
+    })
   });
