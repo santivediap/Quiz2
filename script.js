@@ -89,6 +89,7 @@ async function paintQuestions() {
             let submitButton = document.createElement("button");
             submitButton.setAttribute("type", "submit");
             submitButton.className = "button-container";
+            submitButton.setAttribute("id", "submit-quiz")
             submitButton.textContent = "Siguiente";
     
             document.querySelector("#quiz").appendChild(submitButton);
