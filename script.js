@@ -122,6 +122,16 @@ function showQuestion() {
         // Borrar boton del formulario
 
         document.querySelector("#submit-quiz").remove()
+
+        // Añadir nuevo anchor para enviar a pagina de resultados
+
+        let resultsButton = document.createElement("a")
+        resultsButton.setAttribute("href", "results.html")
+        resultsButton.setAttribute("id", "results-anchor")
+        resultsButton.textContent = "Resultados"
+        resultsButton.className = "button-container"
+
+        document.querySelector("#quiz").appendChild(resultsButton)
     }
 }
 
