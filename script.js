@@ -118,6 +118,10 @@ function showQuestion() {
         existingResults.push(playerResults)
 
         localStorage.results = JSON.stringify(existingResults)
+
+        // Borrar boton del formulario
+
+        document.querySelector("#submit-quiz").remove()
     }
 }
 
