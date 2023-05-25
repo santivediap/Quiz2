@@ -1,9 +1,8 @@
 // Variables globales
 
 let counter = 0;
-
-let countRightAnswers = 0;
-let countWrongAnswers = 0;
+let countRightAnswers;
+let countWrongAnswers;
 
 let questionsList = []
 
@@ -120,6 +119,7 @@ function showQuestion() {
         existingResults.push(playerResults)
 
         localStorage.results = JSON.stringify(existingResults)
+        localStorage.summary = JSON.stringify([countRightAnswers, countWrongAnswers])
 
         // Borrar boton del formulario
 
@@ -141,12 +141,25 @@ function showQuestion() {
 
 getQuestions().then(val => {
     questionsList = val.results
+
     paintQuestions()
+    showResults()
 
     if(document.querySelector(".ct-chart")) {
         paintGraph()
     }
 })
+
+// Reinicio de variables con Start Anchor
+
+if(document.getElementById("start-button")) {
+    document.getElementById("start-button").addEventListener("click", () => {
+        localStorage.summary = JSON.stringify([])
+
+        countRightAnswers = 0;
+        countWrongAnswers = 0;
+    })
+}
 
 // VALIDACION DEL FORMULARIO
 
@@ -200,4 +213,24 @@ new Chartist.Bar('.ct-chart', {
   }, {
     distributeSeries: true
   });
+}
+
+// Mostrar resultados de la partida
+
+function showResults() {
+    if(document.getElementById("results")) {
+
+        let localResults = JSON.parse(localStorage.summary)
+
+        let resultsP = document.createElement("p")
+        resultsP.appendChild(document.createTextNode(`Acertaste ${localResults[0]} preguntas de ${localResults[0]+localResults[1]} preguntas en total!`))
+
+        let backAnchor = document.createElement("a")
+        backAnchor.setAttribute("href", "../index.html")
+        backAnchor.className = "button-container"
+        backAnchor.appendChild(document.createTextNode("Volver"))
+
+        document.getElementById("results").appendChild(resultsP)
+        document.getElementById("results").appendChild(backAnchor)
+    }
 }
