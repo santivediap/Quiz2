@@ -124,34 +124,66 @@ function showQuestion() {
 
 getQuestions().then(val => {
     questionsList = val.results
-    console.log(questionsList);
     paintQuestions()
 })
 
 // VALIDACION DEL FORMULARIO
 
-document.querySelector("#quiz").addEventListener("submit", function (event) {
-    event.preventDefault();
-  
-    let selectedOptions = document.querySelectorAll(".options-container input:checked");
-  
-    let correctCount = 0;
-    let incorrectCount = 0;
-  
-    selectedOptions.forEach((option) => {
-      let questionIndex = option.getAttribute("name");
-      let question = document.querySelectorAll(".hide")[questionIndex];
-  
-    if (option.value == questionsList[questionIndex].correct_answer) {
-            correctCount++;
-        } else {
-            incorrectCount++;
-        }
+document.addEventListener("DOMContentLoaded", function() {
 
-        countRightAnswers = correctCount
-        countWrongAnswers = incorrectCount
-    console.log("Respuestas correctas: " + correctCount);
-    console.log("Respuestas incorrectas: " + incorrectCount);
-    })
-    showQuestion()
+    document.querySelector("#quiz").addEventListener("submit", function (event) {
+        event.preventDefault();
+    
+        let selectedOptions = document.querySelectorAll(".options-container input:checked");
+    
+        let correctCount = 0;
+        let incorrectCount = 0;
+    
+        selectedOptions.forEach((option) => {
+          let questionIndex = option.getAttribute("name");
+          let question = document.querySelectorAll(".hide")[questionIndex];
+    
+        if (option.value == questionsList[questionIndex].correct_answer) {
+                correctCount++;
+            } else {
+                incorrectCount++;
+            }
+
+            countRightAnswers = correctCount
+            countWrongAnswers = incorrectCount
+        console.log("Respuestas correctas: " + correctCount);
+        console.log("Respuestas incorrectas: " + incorrectCount);
+        })
+        showQuestion()
+      });
+});
+
+// Sacar informacion de partidas de LocalStorage y pintar Grafica
+
+document.addEventListener("DOMContentLoaded", function() {
+    paintGraph();
   });
+
+async function paintGraph () { 
+
+const dateData = [];
+const markData = [];
+
+const getGamesData = JSON.parse(localStorage.getItem('results'));
+  
+    for (let i = 0; i < getGamesData.length; i++) {
+      
+    const date = getGamesData[i].date;
+    const mark = getGamesData[i].mark;
+  
+    dateData.push(date);
+    markData.push(mark);
+} console.log(dateData, markData)
+  
+new Chartist.Bar('.ct-chart', {
+    labels: dateData,
+    series: markData
+  }, {
+    distributeSeries: true
+  });
+}
