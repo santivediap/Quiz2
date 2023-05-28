@@ -115,6 +115,7 @@ function showQuestion() {
         counter += 1;
     } else {
         let playerResults = {date: new Date().toJSON(), mark: countRightAnswers}
+        createPlayer(playerResults);
         let existingResults = JSON.parse(localStorage.results)
         existingResults.push(playerResults)
 
@@ -147,6 +148,7 @@ getQuestions().then(val => {
 
     if(document.querySelector(".ct-chart")) {
         paintGraph()
+        paintSecondGraph()
     }
 })
 
@@ -214,12 +216,21 @@ new Chartist.Bar('#localStorageChart', {
     distributeSeries: true
   });
 
-  createPlayer( {
-    dateData,
-    markData,
-});
+  db.collection("Games Played")
+  .get()
+  .then((querySnapshot) => {
+    const dateData = [];
+    const markData = [];
 
-paintSecondGraph()
+    querySnapshot.forEach((doc) => {
+      const gameData = doc.data();
+      const {date, mark } = gameData;
+
+      dateData.push(date);
+      markData.push(mark);
+    });
+
+})
 }
 
 // Mostrar resultados de la partida
@@ -264,8 +275,12 @@ const db = firebase.firestore();
 // Crear players data
 
 const createPlayer = (player) => {
+
+const {id, date, mark} = player;
+
     db.collection("Games Played")
-      .add(player)
+      .doc(id)
+      .set({ date, mark})
       .then((docRef) => console.log("Document written with ID: ", docRef.id))
       .catch((error) => console.error("Error adding document: ", error));
   };
@@ -273,13 +288,6 @@ const createPlayer = (player) => {
 // Funcion para pintar segunda grafica
 
 function paintSecondGraph() {
-    const fireStoreChart = new Chartist.Bar('#fireStoreChart', {
-      labels: [],
-      series: [[]]
-    }, {
-      distributeSeries: true
-    });
-  
     db.collection("Games Played")
       .get()
       .then((querySnapshot) => {
@@ -288,18 +296,29 @@ function paintSecondGraph() {
   
         querySnapshot.forEach((doc) => {
           const gameData = doc.data();
-          const date = gameData.dateData;
-          const mark = gameData.markData;
+          const { date, mark } = gameData;
   
           dateData.push(date);
           markData.push(mark);
         });
   
-        // Actualizar los datos en la segunda gráfica
-        fireStoreChart.data.labels = dateData;
-        fireStoreChart.data.series = [markData];
+        // Obtener el contenedor de la gráfica existente
+        const chartContainer = document.querySelector('#fireStoreChart');
   
-        // Actualizar la segunda gráfica después de obtener los datos
+        // Eliminar la gráfica existente si hay una
+        if (chartContainer.firstChild) {
+          chartContainer.firstChild.remove();
+        }
+  
+        // Crear una nueva instancia de Chartist.Bar con los nuevos datos
+        const fireStoreChart = new Chartist.Bar('#fireStoreChart', {
+          labels: dateData,
+          series: markData
+        }, {
+          distributeSeries: true
+        });
+  
+        // Renderizar la nueva gráfica
         fireStoreChart.update();
       })
       .catch((error) => {
