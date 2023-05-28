@@ -115,6 +115,7 @@ function showQuestion() {
         counter += 1;
     } else {
         let playerResults = {date: new Date().toJSON(), mark: countRightAnswers}
+        createPlayer(playerResults);
         let existingResults = JSON.parse(localStorage.results)
         existingResults.push(playerResults)
 
@@ -147,6 +148,7 @@ getQuestions().then(val => {
 
     if(document.querySelector(".ct-chart")) {
         paintGraph()
+        paintSecondGraph()
     }
 
     if(document.querySelectorAll("form .menu-container")) {
@@ -216,12 +218,28 @@ const getGamesData = JSON.parse(localStorage.getItem('results'));
     markData.push(mark);
 }
   
-new Chartist.Bar('.ct-chart', {
+new Chartist.Bar('#localStorageChart', {
     labels: dateData,
     series: markData
   }, {
     distributeSeries: true
   });
+
+  db.collection("Games Played")
+  .get()
+  .then((querySnapshot) => {
+    const dateData = [];
+    const markData = [];
+
+    querySnapshot.forEach((doc) => {
+      const gameData = doc.data();
+      const {date, mark } = gameData;
+
+      dateData.push(date);
+      markData.push(mark);
+    });
+
+})
 }
 
 // Mostrar resultados de la partida
@@ -243,3 +261,76 @@ function showResults() {
         document.getElementById("results").appendChild(backAnchor)
     }
 }
+
+// FIREBASE CONFIG
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBVxHrmoFMF_NBmyvWJleHrk69s9jcaz4w",
+    authDomain: "front-end-proyect.firebaseapp.com",
+    projectId: "front-end-proyect",
+    storageBucket: "front-end-proyect.appspot.com",
+    messagingSenderId: "249178775762",
+    appId: "1:249178775762:web:678b68fdce9bc1c1008d0b"
+  };
+
+// Initialize Firebase
+
+firebase.initializeApp(firebaseConfig);
+
+// Iniciar Firestore
+
+const db = firebase.firestore();
+
+// Crear players data
+
+const createPlayer = (player) => {
+
+const {id, date, mark} = player;
+
+    db.collection("Games Played")
+      .doc(id)
+      .set({ date, mark})
+      .then((docRef) => console.log("Document written with ID: ", docRef.id))
+      .catch((error) => console.error("Error adding document: ", error));
+  };
+
+// Funcion para pintar segunda grafica
+
+function paintSecondGraph() {
+    db.collection("Games Played")
+      .get()
+      .then((querySnapshot) => {
+        const dateData = [];
+        const markData = [];
+  
+        querySnapshot.forEach((doc) => {
+          const gameData = doc.data();
+          const { date, mark } = gameData;
+  
+          dateData.push(date);
+          markData.push(mark);
+        });
+  
+        // Obtener el contenedor de la gráfica existente
+        const chartContainer = document.querySelector('#fireStoreChart');
+  
+        // Eliminar la gráfica existente si hay una
+        if (chartContainer.firstChild) {
+          chartContainer.firstChild.remove();
+        }
+  
+        // Crear una nueva instancia de Chartist.Bar con los nuevos datos
+        const fireStoreChart = new Chartist.Bar('#fireStoreChart', {
+          labels: dateData,
+          series: markData
+        }, {
+          distributeSeries: true
+        });
+  
+        // Renderizar la nueva gráfica
+        fireStoreChart.update();
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
+      });
+  }

@@ -23,12 +23,19 @@
             <a href="pages/quiz.html" class="button-container" id="start-button">¡JUGAR!</a>
         </section>
         <section class="menu-container">
-            <h3>¡Resultados últimas partidas!</h3>
-            <div class="ct-chart ct-perfect-fourth"></div>
+            <h3>¡Resultados desde LocalStorage!</h3>
+            <div class="ct-chart ct-perfect-fourth" id="localStorageChart"></div>
+        </section>
+        <section class="menu-container">
+            <h3>¡Resultados desde FireStore!</h3>
+            <div class="ct-chart ct-perfect-fourth" id="fireStoreChart"></div>
         </section>
     </main>
     <footer class="footer">
     </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="./script.js"></script>
 </body>
 </html>
