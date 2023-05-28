@@ -2,7 +2,6 @@
 
 let counter = 0;
 let countRightAnswers;
-let countWrongAnswers;
 
 let questionsList = []
 
@@ -61,7 +60,8 @@ async function paintQuestions() {
         
                     questionOptions.forEach(element => {
                         let optionLabel = document.createElement("label")
-                        optionLabel.className = "option"
+                        optionLabel.className = "unselected-option"
+                        optionLabel.setAttribute("id", "options")
         
                         let optionParagraph = document.createElement("p")
                         let optionParagraphText = document.createTextNode(element)
@@ -119,7 +119,7 @@ function showQuestion() {
         existingResults.push(playerResults)
 
         localStorage.results = JSON.stringify(existingResults)
-        localStorage.summary = JSON.stringify([countRightAnswers, countWrongAnswers])
+        localStorage.summary = JSON.stringify([countRightAnswers])
 
         // Borrar boton del formulario
 
@@ -148,6 +148,19 @@ getQuestions().then(val => {
     if(document.querySelector(".ct-chart")) {
         paintGraph()
     }
+
+    if(document.querySelectorAll("form .menu-container")) {
+        document.querySelectorAll("#question").forEach((val, key) => {
+            document.querySelectorAll(`label:has(> input[name="${key}"])`).forEach(v => {
+                v.addEventListener("click", function(event) {
+                    document.querySelectorAll(`label:has(> input[name="${key}"])`).forEach(val => {
+                        val.className = "unselected-option"
+                    })
+                    v.className = "selected-option"
+            })
+            })
+            })
+    }
 })
 
 // Reinicio de variables con Start Anchor
@@ -170,7 +183,6 @@ if(document.getElementById("start-button")) {
             let selectedOptions = document.querySelectorAll(".options-container input:checked");
         
             let correctCount = 0;
-            let incorrectCount = 0;
         
             selectedOptions.forEach((option) => {
               let questionIndex = option.getAttribute("name");
@@ -178,12 +190,9 @@ if(document.getElementById("start-button")) {
         
             if (option.value == questionsList[questionIndex].correct_answer) {
                     correctCount++;
-                } else {
-                    incorrectCount++;
                 }
     
                 countRightAnswers = correctCount
-                countWrongAnswers = incorrectCount
             })
             showQuestion()
           });
@@ -223,7 +232,7 @@ function showResults() {
         let localResults = JSON.parse(localStorage.summary)
 
         let resultsP = document.createElement("p")
-        resultsP.appendChild(document.createTextNode(`Acertaste ${localResults[0]} preguntas de ${localResults[0]+localResults[1]} preguntas en total!`))
+        resultsP.appendChild(document.createTextNode(`Acertaste ${localResults[0]} preguntas de ${questionsList.length} preguntas en total!`))
 
         let backAnchor = document.createElement("a")
         backAnchor.setAttribute("href", "../index.html")
