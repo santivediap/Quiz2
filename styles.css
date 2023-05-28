@@ -13,7 +13,7 @@
   }
   
   /* This selector overrides the points style on line charts. Points on line charts are actually just very short strokes. This allows you to customize even the point size in CSS */
-  .ct-series-a .ct-point {
+.ct-series-a .ct-point {
     /* Colour of your points */
     stroke: red;
     /* Size of your points */

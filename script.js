@@ -207,12 +207,19 @@ const getGamesData = JSON.parse(localStorage.getItem('results'));
     markData.push(mark);
 }
   
-new Chartist.Bar('.ct-chart', {
+new Chartist.Bar('#localStorageChart', {
     labels: dateData,
     series: markData
   }, {
     distributeSeries: true
   });
+
+  createPlayer( {
+    dateData,
+    markData,
+});
+
+paintSecondGraph()
 }
 
 // Mostrar resultados de la partida
@@ -234,3 +241,68 @@ function showResults() {
         document.getElementById("results").appendChild(backAnchor)
     }
 }
+
+// FIREBASE CONFIG
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBVxHrmoFMF_NBmyvWJleHrk69s9jcaz4w",
+    authDomain: "front-end-proyect.firebaseapp.com",
+    projectId: "front-end-proyect",
+    storageBucket: "front-end-proyect.appspot.com",
+    messagingSenderId: "249178775762",
+    appId: "1:249178775762:web:678b68fdce9bc1c1008d0b"
+  };
+
+// Initialize Firebase
+
+firebase.initializeApp(firebaseConfig);
+
+// Iniciar Firestore
+
+const db = firebase.firestore();
+
+// Crear players data
+
+const createPlayer = (player) => {
+    db.collection("Games Played")
+      .add(player)
+      .then((docRef) => console.log("Document written with ID: ", docRef.id))
+      .catch((error) => console.error("Error adding document: ", error));
+  };
+
+// Funcion para pintar segunda grafica
+
+function paintSecondGraph() {
+    const fireStoreChart = new Chartist.Bar('#fireStoreChart', {
+      labels: [],
+      series: [[]]
+    }, {
+      distributeSeries: true
+    });
+  
+    db.collection("Games Played")
+      .get()
+      .then((querySnapshot) => {
+        const dateData = [];
+        const markData = [];
+  
+        querySnapshot.forEach((doc) => {
+          const gameData = doc.data();
+          const date = gameData.dateData;
+          const mark = gameData.markData;
+  
+          dateData.push(date);
+          markData.push(mark);
+        });
+  
+        // Actualizar los datos en la segunda gráfica
+        fireStoreChart.data.labels = dateData;
+        fireStoreChart.data.series = [markData];
+  
+        // Actualizar la segunda gráfica después de obtener los datos
+        fireStoreChart.update();
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
+      });
+  }
